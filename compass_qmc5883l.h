@@ -2,11 +2,12 @@
 #define COMPASS_QMC5883L_H
 
 #include <stdbool.h>
+#include <math.h>
 #include "stm32f7xx_hal.h"
 #include "stm32f7xx_hal_def.h"
 #include "stm32f7xx_hal_i2c.h"
 
-
+#define QMC5883L_DECLINATION_ANGLE	93.67/1000	//turkey
 #define QMC5883L_MAG_I2C_ADDRESS 0x0D<<1
 
 // Registers
@@ -39,12 +40,17 @@
 #define QMC5883L_REG_ID 0x0D
 #define QMC5883_ID_VAL 0xFF
 
+#ifndef M_PI 
+#define M_PI 3.14159265358979323846264338327950288f 
+#endif
+
 //TIMEOUT
 #define TM_GLOB 100
 
 
 bool qmc5883lInit(I2C_HandleTypeDef *hi2c);
 bool qmc5883lRead(I2C_HandleTypeDef *hi2c, int16_t *magData);
+bool qmc5883lReadHeading(I2C_HandleTypeDef *hi2c, float *heading);
 bool qmc5883lDetect(I2C_HandleTypeDef *hi2c);
 uint16_t searchDevice(I2C_HandleTypeDef *hi2c);
 #endif

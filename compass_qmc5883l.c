@@ -1,5 +1,11 @@
 #include "compass_qmc5883l.h"
 
+static float xMax = 0;
+static float xMin = 0;
+static float yMax = 0;
+static float yMin = 0;
+
+
 bool qmc5883lInit(I2C_HandleTypeDef *hi2c)
 {
 
@@ -79,6 +85,52 @@ bool qmc5883lDetect(I2C_HandleTypeDef *hi2c)
 
     return false;
 }
+
+bool qmc5883lReadHeading(I2C_HandleTypeDef *hi2c, float *heading)
+{ 
+	int16_t magData[3];
+	if (!qmc5883lRead(hi2c, magData))
+	  return false;
+
+	float X = 0, Y = 0;
+	float xRaw = magData[0];
+	float yRaw = magData[1];
+
+  	if (xRaw < xMin)
+       	  xMin = xRaw;
+    	else if (xRaw > xMax)
+	  xMax = xRaw;
+
+  	if (yRaw < yMin)
+          yMin = yRaw;
+    	else if (yRaw > yMax) 
+	  yMax = yRaw; 
+
+  
+  	if (xMin == xMax || yMin == yMax) 
+	  return false;
+
+ 	X -= (xMax + xMin) / 2; 
+  	Y -= (yMax + yMin) / 2; 
+    
+  	X = X / (xMax - xMin); 
+  	Y = Y / (yMax - yMin); 
+
+  	*heading = atan2(Y,X);
+
+	//EAST
+	*heading += QMC5883L_DECLINATION_ANGLE;
+	//WEST
+	//heading -= QMC5883L_DECLINATION_ANGLE;
+		
+	if (*heading < 0)
+   	  *heading += 2 * M_PI;
+	else if (*heading > 2 * M_PI)
+   	  *heading -= 2 * M_PI;
+ 
+ return true; 
+} 
+
 
 uint16_t searchDevice(I2C_HandleTypeDef *hi2c)
 {
