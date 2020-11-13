@@ -1,5 +1,5 @@
 # QMC5883l_compass
-C implementation of QMC5883l driver
+C implementation of QMC5883l driver for STM32 devices using  stm32fxxx_hal drivers
 
 
 ### To use it
