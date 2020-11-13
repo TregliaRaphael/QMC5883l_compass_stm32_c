@@ -116,7 +116,8 @@ bool qmc5883lReadHeading(I2C_HandleTypeDef *hi2c, float *heading)
   	X = X / (xMax - xMin); 
   	Y = Y / (yMax - yMin); 
 
-  	*heading = atan2(Y,X);
+  	*heading = atan2(Y, X);
+	//heading = atan2(Y, X) * 180 / M_PI
 
 	//EAST
 	*heading += QMC5883L_DECLINATION_ANGLE;
